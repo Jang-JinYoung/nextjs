@@ -18,19 +18,22 @@ mkdir -p "$TARGET"
 cat > "$LAYOUT_FILE" <<EOF
 // ${LAYOUT_FILE}
 
-const ${LAYOUT_VAR} = ({ children }: { children: React.ReactNode }) => (
-  <section>
-    <header>
-      <h1>${LAYOUT_VAR} Component</h1>
-    </header>
-    <main>
-      {children}
-    </main>
-    <footer>
-      <small>© 2025 Example Layout</small>
-    </footer>
-  </section>
-);
+const ${LAYOUT_VAR} = ({ children }: { children: React.ReactNode }) => {
+
+  return (
+    <section>
+      <header>
+        <h1>${LAYOUT_VAR} Component</h1>
+      </header>
+      <main>
+        {children}
+      </main>
+      <footer>
+        <small>© 2025 Example Layout</small>
+      </footer>
+    </section>
+  );
+};
 
 export default ${LAYOUT_VAR};
 EOF
@@ -38,12 +41,14 @@ EOF
 cat > "$PAGE_FILE" <<EOF
 // ${PAGE_FILE}
 
-const ${PAGE_VAR} = () => (
-  <div>
-    <h2>${PAGE_VAR} Component</h2>
-    <p>This is an auto-generated page for /${NAME}.</p>
-  </div>
-);
+const ${PAGE_VAR} = () => {
+  return (
+    <div>
+      <h2>${PAGE_VAR} Component</h2>
+      <p>This is an auto-generated page for /${NAME}.</p>
+    </div>
+  );
+};
 
 export default ${PAGE_VAR};
 EOF
