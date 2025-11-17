@@ -1,38 +1,37 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 
 interface LoginData {
   email: string;
   password: string;
 }
 
+// 서버에서 반환할 응답 타입 (원하는 형태로 수정 가능)
 interface LoginResponse {
   success: boolean;
   message?: string;
+  token?: string;
 }
 
-export const useLogin = () => {
-  const queryClient = useQueryClient();
-
+export const useLogin = (
+  options?: UseMutationOptions<LoginResponse, Error, LoginData>
+) => {
   return useMutation<LoginResponse, Error, LoginData>({
-    mutationFn: async (data) => {
+    mutationFn: async (data: LoginData) => {
       const res = await fetch("/api/auth/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
+        credentials: "include", // ✅ 세션/쿠키 필요 시
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "로그인 실패");
+        const errorBody = await res.json().catch(() => ({}));
+        const message = errorBody.message || "로그인 실패";
+        throw new Error(message);
       }
 
       return res.json();
     },
-    onSuccess: () => {
-      // 로그인 성공 시, me 쿼리 다시 불러오기
-      queryClient.invalidateQueries({ queryKey: ["me"] });
-    },
+    ...options, // ✅ 외부에서 전달한 onSuccess, onError 적용
   });
 };

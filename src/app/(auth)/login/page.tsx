@@ -3,49 +3,60 @@
 import { useState } from "react";
 import { useLogin } from "@/hooks/useLogin";
 import styles from "./login.module.css";
+import { useRouter } from "next/navigation"; // ✅ App Router 전용
 
 export default function LoginPage() {
-  const { mutate: login, isPending } = useLogin();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+    const router = useRouter(); // ✅ 라우터 선언
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    login({ email, password });
-  };
+    const { mutate: login, isPending } = useLogin({
+        onSuccess: () => {
+            router.push("/"); // ✅ 성공 시 홈으로 이동
+        },
+    });
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>로그인</h1>
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.field}>
-            <label htmlFor="email">이메일</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        login({ email, password });
+    };
 
-          <div className={styles.field}>
-            <label htmlFor="password">비밀번호</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+    return (
+        <div className={styles.container}>
+            <div className={styles.card}>
+                <h1 className={styles.title}>로그인</h1>
+                <form onSubmit={handleSubmit} className={styles.form}>
+                    <div className={styles.field}>
+                        <label htmlFor="email">이메일</label>
+                        <input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
 
-          <button type="submit" className={styles.button} disabled={isPending}>
-            {isPending ? "로그인 중..." : "로그인"}
-          </button>
-        </form>
-      </div>
-    </div>
-  );
+                    <div className={styles.field}>
+                        <label htmlFor="password">비밀번호</label>
+                        <input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <button
+                        type="submit"
+                        className={styles.button}
+                        disabled={isPending}
+                    >
+                        {isPending ? "로그인 중..." : "로그인"}
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
 }
