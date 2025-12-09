@@ -10,7 +10,7 @@ export default function LoginPage() {
 
     const { mutate: login, isPending } = useLogin({
         onSuccess: () => {
-            router.push("/"); // ✅ 성공 시 홈으로 이동
+            router.push("/schedule"); // ✅ 성공 시 홈으로 이동
         },
     });
     const [email, setEmail] = useState("");
