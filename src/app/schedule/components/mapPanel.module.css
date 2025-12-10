@@ -3,13 +3,7 @@
   height: 100%;
 }
 
-.placeholder {
+.map {
   width: 100%;
   height: 100%;
-  background-color: #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  color: #6b7280;
 }
