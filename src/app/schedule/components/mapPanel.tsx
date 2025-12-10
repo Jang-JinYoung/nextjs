@@ -1,22 +1,28 @@
 "use client";
 
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { GoogleMap, LoadScript } from "@react-google-maps/api";
 import styles from "./mapPanel.module.css";
+import { LatLng } from "@/types/latLng";
 
-export default function MapPanel() {
-  const center = { lat: 37.4979, lng: 127.0276 };
+interface IProps {
+    center: LatLng;
+    onClick: (e: google.maps.MapMouseEvent) => void;
+    children: React.ReactNode;
+}
 
-  return (
-    <div className={styles.wrapper}>
-      <LoadScript googleMapsApiKey={process.env.GOOGLE_MAP_KEY!}>
-        <GoogleMap
-          mapContainerStyle={{ width: "100%", height: "100%" }}
-          center={center}
-          zoom={15}
-        >
-          <Marker position={center} />
-        </GoogleMap>
-      </LoadScript>
-    </div>
-  );
+export default function MapPanel({ center, onClick, children}: IProps) {
+    return (
+        <div className={styles.wrapper}>
+            <LoadScript googleMapsApiKey={process.env.GOOGLE_MAP_KEY!}>
+                <GoogleMap
+                    mapContainerStyle={{ width: "100%", height: "100%" }}
+                    center={center}
+                    zoom={15}
+                    onClick={onClick} // ✅ 여기서 클릭 감지
+                >
+                    {children}
+                </GoogleMap>
+            </LoadScript>
+        </div>
+    );
 }
