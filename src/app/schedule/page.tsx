@@ -1,17 +1,14 @@
 "use client";
 // src/app/schedule/page.tsx
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import MapPanel from "./components/mapPanel";
 import SchedulePanel from "./components/schedulePanel";
 import styles from "./schedule.module.css";
 import { DEFAULT_LATLNG, LatLng } from "@/types/latLng";
-import { Marker } from "@react-google-maps/api";
 
 const schedulePage = () => {
     const [center, setCenter] = useState<LatLng>(DEFAULT_LATLNG);
-
-    const [markers, setMarkers] = useState<LatLng[]>([]);
 
     useEffect(() => {
         if (!navigator.geolocation) {
@@ -27,7 +24,6 @@ const schedulePage = () => {
                 };
 
                 setCenter(currentPos);
-                setMarkers([currentPos]);
             },
             (error) => {
                 console.error("위치 권한 거부 또는 에러:", error);
@@ -39,17 +35,39 @@ const schedulePage = () => {
         );
     }, []);
 
-    // 지도 클릭 시 실행 마커 생성
-    const addMarker = useCallback((e: google.maps.MapMouseEvent) => {
-        if (!e.latLng) return;
+    const onMapClick = async (latLng: LatLng) => {
+        try {
+            const { Place } = (await google.maps.importLibrary(
+                "places"
+            )) as google.maps.PlacesLibrary;
 
-        const newMarker = {
-            lat: e.latLng.lat(),
-            lng: e.latLng.lng(),
-        };
+            const { places } = await Place.searchNearby({
+                locationRestriction: {
+                    center: latLng,
+                    radius: 30, // 기존과 동일: 30m
+                },
+                fields: [
+                    "id",
+                    "displayName",
+                    "formattedAddress",
+                    "location",
+                    "rating",
+                    "websiteURI",
+                ],
+            });
 
-        setMarkers((prev) => [...prev, newMarker]);
-    }, []);
+            if (!places || places.length === 0) {
+                return;
+            }
+
+            // ✅ 가장 가까운 장소 1개 선택
+            const targetPlace = places[0];
+            console.log(targetPlace.displayName);
+
+        } catch (error) {
+            console.error("❌ Place 검색 실패:", error);
+        }
+    };
 
     return (
         <div className={styles.wrapper}>
@@ -57,11 +75,7 @@ const schedulePage = () => {
                 <SchedulePanel />
             </aside>
             <main className={styles.right}>
-                <MapPanel center={center} onClick={addMarker}>
-                    {markers.map((marker: LatLng, idx: number) => (
-                        <Marker key={idx} position={marker} />
-                    ))}
-                </MapPanel>
+                <MapPanel center={center} isMarker={true} onMapClickCallback={onMapClick}/>
             </main>
         </div>
     );
